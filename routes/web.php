@@ -9,6 +9,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 
 
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -28,7 +29,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+ 
     // Add more admin routes as needed
 });
 
@@ -47,6 +51,7 @@ Route::middleware(['auth', 'role:buyer'])->group(function () {
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::put('/cart/update/{cartItem}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
+    
 });
 
 // Checkout Route
@@ -59,5 +64,8 @@ Route::middleware(['auth', 'role:buyer'])->group(function () {
 Route::middleware(['auth', 'role:buyer|admin|seller'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+   // Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+   // Route::post('/orders/{order}/delete', [OrderController::class, 'destroy'])->name('orders.destroy');
 });
+
 require __DIR__.'/auth.php';

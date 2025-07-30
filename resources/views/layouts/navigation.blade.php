@@ -10,6 +10,8 @@
                 @auth
                     @if (auth()->user()->hasRole('buyer'))
                         <a href="{{ route('cart.index') }}" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Cart</a>
+                    @endif
+                    @if (auth()->user()->hasAnyRole(['buyer', 'admin', 'seller']))
                         <a href="{{ route('orders.index') }}" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Orders</a>
                     @endif
                     

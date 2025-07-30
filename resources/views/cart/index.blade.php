@@ -33,7 +33,7 @@
                             @foreach ($cart->items as $item)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $item->product->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">${{ number_format($item->product->price, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">₹{{ number_format($item->product->price, 2) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <form action="{{ route('cart.update', $item) }}" method="POST" class="inline-flex">
                                             @csrf
@@ -42,7 +42,7 @@
                                             <button type="submit" class="ml-2 text-blue-600 hover:text-blue-800">Update</button>
                                         </form>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">${{ number_format($item->quantity * $item->product->price, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">₹{{ number_format($item->quantity * $item->product->price, 2) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <form action="{{ route('cart.remove', $item) }}" method="POST">
                                             @csrf
@@ -56,7 +56,7 @@
                     </table>
                 </div>
                 <div class="mt-6 flex justify-between items-center">
-                    <p class="text-xl font-bold text-gray-900">Total: ${{ number_format($cart->total, 2) }}</p>
+                    <p class="text-xl font-bold text-gray-900">Total: ₹{{ number_format($cart->total, 2) }}</p>
                     <a href="{{ route('checkout.index') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Proceed to Checkout</a>
                 </div>
             @else

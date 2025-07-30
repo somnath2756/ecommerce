@@ -32,20 +32,20 @@
                         @foreach ($cart->items as $item)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $item->product->name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">${{ number_format($item->product->price, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">₹{{ number_format($item->product->price, 2) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $item->quantity }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">${{ number_format($item->quantity * $item->product->price, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">₹{{ number_format($item->quantity * $item->product->price, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-                <p class="text-xl font-bold text-gray-900 mb-6">Total: ${{ number_format($cart->total, 2) }}</p>
+                <p class="text-xl font-bold text-gray-900 mb-6">Total: ₹{{ number_format($cart->total, 2) }}</p>
 
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Shipping Information</h2>
                 <form action="{{ route('checkout.placeOrder') }}" method="POST" class="space-y-4">
                     @csrf
                     <div>
-                        <label for="address" class="block text-sm font-medium text-gray-700">Shipping Address</label>
+                        <label for="address" class="3block text-sm font-medium text-gray-700">Shipping Address</label>
                         <textarea name="address" id="address" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>{{ old('address') }}</textarea>
                     </div>
                     <div class="flex justify-end">

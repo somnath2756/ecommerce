@@ -1,6 +1,10 @@
+
 <x-app-layout>
     <div class="min-h-screen">
-        {{--@include('navigation')--}}
+        <!-- Include custom CSS -->
+        @push('styles')
+            <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+        @endpush
 
         <!-- Main Content -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,20 +22,20 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @forelse ($products as $product)
                     <div class="bg-white shadow-md rounded-lg overflow-hidden">
                         @if ($product->image)
-                            <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
+                            <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="w-full h-48 object-cover product-image">
                         @else
-                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center product-image">
                                 <span class="text-gray-500">No Image</span>
                             </div>
                         @endif
                         <div class="p-6">
                             <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ $product->name }}</h2>
                             <p class="text-gray-600 mb-4">{{ Str::limit($product->description, 100) }}</p>
-                            <p class="text-lg font-bold text-gray-900 mb-4">${{ number_format($product->price, 2) }}</p>
+                            <p class="text-lg font-bold text-gray-900 mb-4">₹{{ number_format($product->price, 2) }}</p>
                             <p class="text-sm text-gray-500 mb-4">In Stock: {{ $product->stock }}</p>
                             @auth
                                 @if (auth()->user()->hasRole('buyer'))
@@ -53,7 +57,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-gray-600">No products available.</p>
+                    <p class="text-gray-600 col-span-full">No products available.</p>
                 @endforelse
             </div>
         </div>

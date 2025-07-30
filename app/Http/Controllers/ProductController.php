@@ -27,7 +27,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('products.create');
+       
+        $categories = Product::whereNotNull('category')->distinct()->pluck('category');
+        return view('products.create', compact('categories'));
     }
 
     /**
@@ -41,6 +43,8 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0.01',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
+            'category' => 'nullable|string|max:255',
+            'new_category' => 'nullable|string|max:255',
         ]);
 
         $imagePath = null;
@@ -54,6 +58,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'stock' => $request->stock,
             'image' => $imagePath,
+            'category' => $category,
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
@@ -76,7 +81,9 @@ class ProductController extends Controller
         if (!auth()->user()->hasRole('admin') && auth()->id() !== $product->user_id) {
             abort(403, 'Unauthorized action.');
         }
-        return view('products.edit', compact('product'));
+
+        $categories = Product::whereNotNull('category')->distinct()->pluck('category');
+        return view('products.edit', compact('product', 'categories'));
     }
 
     /**
@@ -95,6 +102,8 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0.01',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'category' => 'nullable|string|max:255',
+            'new_category' => 'nullable|string|max:255',
         ]);
 
         $imagePath = $product->image;
@@ -110,6 +119,8 @@ class ProductController extends Controller
             }
             $imagePath = null;
         }
+        // Use new_category if provided, otherwise use category
+        $category = $request->filled('new_category') ? $request->new_category : $request->category;
 
         $product->update([
             'name' => $request->name,
@@ -117,6 +128,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'stock' => $request->stock,
             'image' => $imagePath,
+            'category' => $category,
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');

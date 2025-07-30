@@ -62,6 +62,7 @@ class CheckoutController extends Controller
             $order = auth()->user()->orders()->create([
                 'total_amount' => $totalAmount,
                 'status' => 'completed', // Or 'pending_payment' depending on your flow
+                'shipping_address' => $request->input('address'),
             ]);
 
             // Attach order items
@@ -82,4 +83,5 @@ class CheckoutController extends Controller
             return redirect()->back()->with('error', 'Failed to place order. Please try again.');
         }
     }
+    
 }

@@ -28,11 +28,12 @@
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $order->id }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $order->created_at->format('Y-m-d') }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">${{ number_format($order->total_amount, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">₹{{ number_format($order->total_amount, 2) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst($order->status) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <a href="{{ route('orders.show', $order) }}" class="text-blue-600 hover:text-blue-800">View Details</a>
                                     </td>
+                                    
                                 </tr>
                             @endforeach
                         </tbody>

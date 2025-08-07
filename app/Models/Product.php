@@ -16,7 +16,9 @@ class Product extends Model
         'price',
         'stock',
         'image',
-        'category',
+        'category_id',
+        'supplier_id',
+        'SKU',
     ];
 
     /**
@@ -25,5 +27,25 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+     public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function invoiceItems()
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
+
+    public function stockAdjustments()
+    {
+        return $this->hasMany(StockAdjustment::class);
     }
 }

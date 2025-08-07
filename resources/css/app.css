@@ -1,5 +1,7 @@
 
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 /* Global styles */
 body {
     font-family: 'Inter', sans-serif;
@@ -35,7 +37,4 @@ body {
     
 }
 
-.add-to-cart-btn:hover {
-    background-color: #2563eb; /* Matches Tailwind's bg-blue-600 hover:bg-blue-700 */
-}
 

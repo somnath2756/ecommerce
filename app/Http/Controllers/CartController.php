@@ -22,10 +22,18 @@ class CartController extends Controller
         ]);
 
         if ($product->stock < $request->quantity) {
+            // Check if it's an AJAX request to return JSON
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Not enough stock available for this product.',
+                ], 400); // Bad Request status
+            }
             return back()->with('error', 'Not enough stock available for this product.');
         }
 
-        $cart = auth()->user()->cart()->firstOrCreate([]);
+        $user = auth()->user();
+        $cart = $user->cart()->firstOrCreate([]);
 
         $cartItem = $cart->items()->where('product_id', $product->id)->first();
 
@@ -33,6 +41,12 @@ class CartController extends Controller
             // Update quantity if item already in cart
             $newQuantity = $cartItem->quantity + $request->quantity;
             if ($product->stock < $newQuantity) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Adding this many items exceeds available stock.',
+                    ], 400);
+                }
                 return back()->with('error', 'Adding this many items exceeds available stock.');
             }
             $cartItem->update(['quantity' => $newQuantity]);
@@ -44,9 +58,48 @@ class CartController extends Controller
             ]);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Product added to cart!');
+        // Calculate total cart items for the user's cart
+        // Assuming your Cart model has a 'hasMany' relationship named 'items' to CartItem
+        // And CartItem has a 'quantity' column
+        $cartCount = $cart->items->sum('quantity');
+
+        // Check if it's an AJAX request to return JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added to cart!',
+                'cartCount' => $cartCount, // Send the updated cart count
+            ]);
+        }
+
+        return back()->with('success', 'Product added to cart!');
     }
 
+    public function contents()
+    {
+        $cart = auth()->check() ? Cart::where('user_id', auth()->id())->first() : null;
+        $cartProductIds = $cart ? $cart->items()->pluck('product_id')->toArray() : [];
+        return response()->json([
+            'cartProductIds' => $cartProductIds,
+        ]);
+    }
+    /**
+     * Get the current cart count for the authenticated user.
+     * This method will be called via AJAX on page load.
+     * Ensure the user is authenticated before calling this.
+     */
+    public function getCartCount(Request $request)
+{
+    $cartCount = 0;
+    if (auth()->check()) {
+        $cart = Cart::where('user_id', auth()->id())->first();
+        $cartCount = $cart ? $cart->items()->sum('quantity') : 0;
+    }
+    return response()->json(['cartCount' => $cartCount]);
+}
+
+
+    
     public function update(Request $request, CartItem $cartItem)
     {
         $request->validate([

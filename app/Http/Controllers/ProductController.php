@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth; // Make sure to use the Auth facade
+use App\Models\Cart; // Make sure to use the Cart model
 
 class ProductController extends Controller
 {
@@ -19,7 +21,10 @@ class ProductController extends Controller
         } else {
             $products = auth()->user()->products; // Seller sees only their products
         }
-        return view('products.index', compact('products'));
+        
+        // Get product IDs in the user's cart
+        $cartProductIds = auth()->check() ? Cart::where('user_id', auth()->id())->first()?->items()->pluck('product_id')->toArray() ?? [] : [];
+        return view('products.index', compact('products','cartProductIds'));
     }
 
     /**
@@ -43,8 +48,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0.01',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
-            'category' => 'nullable|string|max:255',
-            'new_category' => 'nullable|string|max:255',
+            
         ]);
 
         $imagePath = null;
@@ -58,7 +62,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'stock' => $request->stock,
             'image' => $imagePath,
-            'category' => $category,
+            
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
@@ -69,6 +73,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        
         return view('products.show', compact('product'));
     }
 

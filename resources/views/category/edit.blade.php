@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Create Category') }}
+            {{ __('Edit Category') }}
         </h2>
     </x-slot>
 
@@ -9,8 +9,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form method="POST" action="{{ route('admin.categories.store') }}">
+                    <form method="POST" action="{{ route('admin.categories.update', $category) }}">
                         @csrf
+                        @method('PUT')
 
                         <div class="mb-4">
                             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -18,7 +19,7 @@
                             </label>
                             <input type="text" name="name" id="name" 
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('name') border-red-500 @enderror"
-                                value="{{ old('name') }}" required>
+                                value="{{ old('name', $category->name) }}" required>
                             @error('name')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -29,7 +30,7 @@
                                 Cancel
                             </a>
                             <button type="submit" class="px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Create Category
+                                Update Category
                             </button>
                         </div>
                     </form>
@@ -38,7 +39,3 @@
         </div>
     </div>
 </x-app-layout>
-?>
-<div>
-    <!-- Waste no more time arguing what a good man should be, be one. - Marcus Aurelius -->
-</div>

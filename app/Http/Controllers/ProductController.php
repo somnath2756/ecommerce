@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category; // Import the Category model
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth; // Make sure to use the Auth facade
@@ -32,8 +33,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-       
-        $categories = Product::whereNotNull('category')->distinct()->pluck('category');
+        $categories = Category::all();
         return view('products.create', compact('categories'));
     }
 
@@ -42,14 +42,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0.01',
-            'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
-            
-        ]);
+        $this->validateProduct($request);
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -62,7 +55,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'stock' => $request->stock,
             'image' => $imagePath,
-            
+            'category_id' => $request->category_id,  // Add this line
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
@@ -82,12 +75,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        // Authorize: Only owner or admin can edit
-        if (!auth()->user()->hasRole('admin') && auth()->id() !== $product->user_id) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $categories = Product::whereNotNull('category')->distinct()->pluck('category');
+        $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }
 
@@ -101,31 +89,20 @@ class ProductController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0.01',
-            'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'category' => 'nullable|string|max:255',
-            'new_category' => 'nullable|string|max:255',
-        ]);
+        $this->validateProduct($request);
 
         $imagePath = $product->image;
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if ($imagePath) {
                 Storage::disk('public')->delete($imagePath);
             }
             $imagePath = $request->file('image')->store('product_images', 'public');
-        } elseif ($request->input('clear_image')) { // Handle checkbox to clear image
+        } elseif ($request->input('clear_image')) {
             if ($imagePath) {
                 Storage::disk('public')->delete($imagePath);
             }
             $imagePath = null;
         }
-        // Use new_category if provided, otherwise use category
-        $category = $request->filled('new_category') ? $request->new_category : $request->category;
 
         $product->update([
             'name' => $request->name,
@@ -133,7 +110,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'stock' => $request->stock,
             'image' => $imagePath,
-            'category' => $category,
+            'category_id' => $request->category_id,  // Add this line
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
@@ -160,5 +137,17 @@ class ProductController extends Controller
     {
         $products = Product::where('stock', '>', 0)->get(); // Only show in-stock products
         return view('products.all', compact('products'));
+    }
+
+    protected function validateProduct(Request $request)
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0.01',
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:category,id',  // Add this line
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
     }
 }

@@ -43,6 +43,12 @@
                             <x-heroicon-o-shield-check class="h-5 w-5 mr-1" />
                             <span class="hidden sm:inline">Admin Panel</span>
                         </a>
+                        
+                        <!-- Add this new category navigation link -->
+                        <a href="{{ route('admin.categories.index') }}" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium flex items-center" title="Categories">
+                            <x-heroicon-o-tag class="h-5 w-5 mr-1" />
+                            <span class="hidden sm:inline">Categories</span>
+                        </a>
                     @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

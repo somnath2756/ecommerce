@@ -32,6 +32,21 @@
                     <textarea name="description" id="description" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('description') }}</textarea>
                 </div>
                 <div class="mb-4">
+                    <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
+                    <select name="category_id" id="category_id" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select a category</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('category_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="mb-4">
                     <label for="price" class="block text-sm font-medium text-gray-700">Price ($)</label>
                     <input type="number" name="price" id="price" step="0.01" min="0.01" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" value="{{ old('price') }}" required>
                 </div>

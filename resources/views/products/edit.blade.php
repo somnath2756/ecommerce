@@ -52,25 +52,22 @@
                     <input type="file" name="image" id="image" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                 </div>
 
-                <div class="form-group">
-                <label for="category">Category</label>
-                <select name="category" id="category" class="form-control @error('category') is-invalid @enderror">
-                    <option value="">Select a category</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category }}" {{ old('category', $product->category) == $category ? 'selected' : '' }}>{{ $category }}</option>
-                    @endforeach
-                </select>
-                @error('category')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            <div class="form-group">
-                <label for="new_category">Or Add New Category</label>
-                <input type="text" name="new_category" id="new_category" class="form-control @error('new_category') is-invalid @enderror" value="{{ old('new_category') }}">
-                @error('new_category')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
+                <div class="mb-4">
+                    <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
+                    <select name="category_id" id="category_id" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select a category</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" 
+                                {{ (old('category_id', $product->category_id) == $category->id) ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('category_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
                 <div class="flex justify-end space-x-4">
                     <a href="{{ route('products.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">Cancel</a>

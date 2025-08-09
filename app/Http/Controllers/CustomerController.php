@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
+use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
@@ -72,5 +73,29 @@ class CustomerController extends Controller
         
         return redirect()->route('customer.index')
             ->with('success', 'Customer deleted successfully.');
+    }
+
+    /**
+     * Search for customers based on query.
+     */
+    public function search(Request $request)
+    {
+        if (!$request->ajax()) {
+            abort(404);
+        }
+
+        $query = $request->get('q');
+        
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+        
+        $customers = Customer::where('name', 'like', "%{$query}%")
+            ->orWhere('phone', 'like', "%{$query}%")
+            ->orWhere('email', 'like', "%{$query}%")
+            ->take(5)
+            ->get(['id', 'name', 'email', 'phone']);
+        
+        return response()->json($customers);
     }
 }

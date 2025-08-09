@@ -10,8 +10,14 @@ class Invoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'invoice_number', 'customer_name', 'customer_email', 'customer_address',
-        'invoice_date', 'due_date', 'total_amount', 'status', 'notes', 'generated_by'
+        'invoice_number',
+        'customer_id',
+        'invoice_date',
+        'due_date',
+        'total_amount',
+        'status',
+        'notes',
+        'generated_by'
     ];
 
     protected $casts = [
@@ -19,6 +25,11 @@ class Invoice extends Model
         'due_date' => 'date',
         'total_amount' => 'decimal:2'
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
 
     public function invoiceItems()
     {

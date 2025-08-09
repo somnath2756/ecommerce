@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -23,7 +24,8 @@ class InvoiceController extends Controller
     public function create()
     {
         $products = Product::all();
-        return view('invoice.create', compact('products'));
+        $customers = Customer::all();
+        return view('invoice.create', compact('products', 'customers'));
     }
 
     /**
@@ -32,21 +34,35 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
+            'customer_id' => 'required|exists:customers,id',
             'invoice_date' => 'required|date',
-            'items' => 'required|string',
-            'total' => 'required|numeric|min:0',
+            'due_date' => 'required|date|after_or_equal:invoice_date',
+            'notes' => 'nullable|string',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.description' => 'required|string'
         ]);
 
-        $invoice = Invoice::create($validated);
-
-        // Example usage in InvoiceController
-        $invoice->addItem([
-            'product_id' => $productId,
-            'description' => $description,
-            'quantity' => $quantity,
-            'unit_price' => $unitPrice
+        $invoice = Invoice::create([
+            'customer_id' => $validated['customer_id'],
+            'invoice_date' => $validated['invoice_date'],
+            'due_date' => $validated['due_date'],
+            'notes' => $validated['notes'] ?? null,
+            'generated_by' => auth()->id()
         ]);
+
+        foreach ($validated['items'] as $item) {
+            $invoice->addItem([
+                'product_id' => $item['product_id'],
+                'description' => $item['description'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['unit_price']
+            ]);
+        }
+
+        $invoice->updateTotalAmount();
 
         return redirect()->route('invoices.index')
             ->with('success', 'Invoice created successfully.');
@@ -66,7 +82,8 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         $products = Product::all();
-        return view('invoice.edit', compact('invoice', 'products'));
+        $customers = Customer::all();
+        return view('invoice.edit', compact('invoice', 'products', 'customers'));
     }
 
     /**
@@ -75,9 +92,7 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
         $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email',
-            'customer_address' => 'required|string',
+            'customer_id' => 'required|exists:customers,id',
             'invoice_date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:invoice_date',
             'notes' => 'nullable|string',
@@ -88,20 +103,15 @@ class InvoiceController extends Controller
             'items.*.description' => 'required|string'
         ]);
 
-        // Update invoice details
         $invoice->update([
-            'customer_name' => $validated['customer_name'],
-            'customer_email' => $validated['customer_email'],
-            'customer_address' => $validated['customer_address'],
+            'customer_id' => $validated['customer_id'],
             'invoice_date' => $validated['invoice_date'],
             'due_date' => $validated['due_date'],
-            'notes' => $validated['notes'] ?? null,
+            'notes' => $validated['notes'] ?? null
         ]);
 
-        // Delete existing items
         $invoice->invoiceItems()->delete();
 
-        // Add new items
         foreach ($validated['items'] as $item) {
             $invoice->addItem([
                 'product_id' => $item['product_id'],
@@ -111,7 +121,6 @@ class InvoiceController extends Controller
             ]);
         }
 
-        // Update total amount
         $invoice->updateTotalAmount();
 
         return redirect()->route('invoices.index')

@@ -19,7 +19,7 @@
         
         <!-- {{-- <link href="{{ asset('css/app.css') }}" rel="stylesheet"> --}}
         @stack('styles') {{-- <--- THIS IS THE CRUCIAL LINE FOR YOUR INLINE STYLES --}} -->
-        
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">

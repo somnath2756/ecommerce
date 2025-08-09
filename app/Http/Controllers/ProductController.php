@@ -49,16 +49,24 @@ class ProductController extends Controller
             $imagePath = $request->file('image')->store('product_images', 'public');
         }
 
-        auth()->user()->products()->create([
+        // Generate SKU
+        $prefix = 'PRD';
+        $timestamp = now()->format('Ymd');
+        $random = strtoupper(substr(uniqid(), -4));
+        $sku = "{$prefix}{$timestamp}-{$random}";
+
+        $product = auth()->user()->products()->create([
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
             'image' => $imagePath,
-            'category_id' => $request->category_id,  // Add this line
+            'category_id' => $request->category_id,
+            'SKU' => $sku, // Add SKU
         ]);
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+        return redirect()->route('products.index')
+            ->with('success', "Product created successfully with SKU: {$product->SKU}");
     }
 
     /**
@@ -146,7 +154,7 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0.01',
             'stock' => 'required|integer|min:0',
-            'category_id' => 'required|exists:category,id',  // Add this line
+            'category_id' => 'required|exists:category,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
     }

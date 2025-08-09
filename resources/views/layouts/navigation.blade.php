@@ -37,6 +37,10 @@
                             <x-heroicon-o-cog-6-tooth class="h-5 w-5 mr-1" />
                             <span class="hidden sm:inline">Manage Products</span>
                         </a>
+                        <a href="{{ route('invoices.index') }}" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium flex items-center" title="Invoices">
+                            <x-heroicon-o-document-text class="h-5 w-5 mr-1" />
+                            <span class="hidden sm:inline">Invoices</span>
+                        </a>
                     @endif
                     @if (auth()->user()->hasRole('admin'))
                         <a href="{{ route('admin.users.index') }}" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium flex items-center" title="Admin Panel">

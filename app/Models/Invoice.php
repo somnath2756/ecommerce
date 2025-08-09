@@ -17,6 +17,7 @@ class Invoice extends Model
     protected $casts = [
         'invoice_date' => 'date',
         'due_date' => 'date',
+        'total_amount' => 'decimal:2'
     ];
 
     public function invoiceItems()
@@ -27,5 +28,25 @@ class Invoice extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'generated_by');
+    }
+
+    public function addItem($data)
+    {
+        $data['subtotal'] = $data['quantity'] * $data['unit_price'];
+        return $this->invoiceItems()->create($data);
+    }
+
+    public function updateTotalAmount()
+    {
+        $this->total_amount = $this->invoiceItems()->sum('subtotal');
+        $this->save();
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($invoice) {
+            $invoice->invoice_number = 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT);
+            $invoice->save();
+        });
     }
 }

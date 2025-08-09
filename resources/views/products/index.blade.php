@@ -19,18 +19,26 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($products as $product)
                             <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <img src="{{ $product->image ? Storage::url($product->image) : asset('images/placeholder.jpg') }}" 
+                                         alt="{{ $product->name }}" 
+                                         class="w-full h-48 object-cover rounded-t-lg">
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $product->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">${{ number_format($product->price, 2) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $product->stock }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ $product->SKU }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <a href="{{ route('products.edit', $product) }}" class="text-blue-600 hover:text-blue-800">Edit</a>
                                     <form action="{{ route('products.destroy', $product) }}" method="POST" class="inline-block">
@@ -42,7 +50,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">No products found.</td>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No products found.</td>
                             </tr>
                         @endforelse
                     </tbody>

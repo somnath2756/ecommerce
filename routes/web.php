@@ -9,6 +9,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\CustomerController;
 
 
 Route::get('/', function () {
@@ -83,6 +84,11 @@ Route::middleware(['auth', 'role:admin|seller'])->group(function () {
     Route::get('/invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
     Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
     Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
+});
+
+// Customer Routes
+Route::middleware(['auth', 'role:admin|seller'])->group(function () {
+    Route::resource('customers', CustomerController::class);
 });
 
 require __DIR__.'/auth.php';
